@@ -2,6 +2,9 @@ package ru.rtlabs;
 
 import ru.rtlabs.DB.DBWorker;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 
 public class PatientSearch {
@@ -71,6 +74,46 @@ public class PatientSearch {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+    }
+    public void regSearch(Integer id, String surname, String name, String pName, Date bDate, Date attachmentDate, DBWorker connection){
+        String sql = "select b.full_name from pci_patient_reg a JOIN pim_organization b on a.clinic_id=b.id where a.patient_id = ? and type_id = 1";
+        try {
+            PreparedStatement preparedStatement = connection.getConnection().prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                if (resultSet.getString(1) != null){
+                    FileWriter fileWriter = new FileWriter("log.txt", true);
+                    BufferedWriter writer = new BufferedWriter(fileWriter);
+                    writer.write( java.util.Calendar.getInstance().getTime() + " у пациента с ID: " + id + " Имя:" + name + " Фамилия: " + surname + " Отчество: " + pName + " День Рождения: " + bDate + " Имеется прикрепление в : " + resultSet.getString(1) + " Для постоянного динамического наблюдения");
+                    writer.newLine();
+                    writer.flush();
+                    writer.close();
+                }else {
+                    addAttachment(surname, name, pName, bDate, attachmentDate, id, connection);
+                }
+            }
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void addAttachment(String surname, String name, String pName,  Date bDate, Date attachmentDate, Integer id, DBWorker connection){
+        String queryAdd = "INSERT INTO pci_patient_reg (id, reg_dt, clinic_id, type_id, patient_id, state_id) VALUES (nextval('pci_patient_reg_id_seq'), ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = connection.getConnection().prepareStatement(queryAdd);
+            preparedStatement.setDate(1, attachmentDate);
+            preparedStatement.setInt(2, 10927);
+            preparedStatement.setInt(3, 1);
+            preparedStatement.setInt(4, id);
+            preparedStatement.setInt(5, 1);
+            preparedStatement.execute();
+            System.out.println(java.util.Calendar.getInstance().getTime() + " Фамилия: " + surname + " Имя: " + name + " Отчество: " + pName + " День Рождения: " + bDate + " добавлен в pci_patient_reg с датой прикрепления " + attachmentDate);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
 
     }
 

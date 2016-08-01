@@ -133,6 +133,8 @@ public class Parser {
                 search.search(patient.getSurname(), patient.getName(), patient.getpName(), patient.getbDate(), patient.getAttachmentDate(), patient.getPolNumber(), connection);
                 if (!search.isHasId()){
                     patientAdd.add(patient.getSurname(), patient.getName(), patient.getpName(), patient.getPolNumber(), patient.getbDate(), patient.getAttachmentDate(), connection);
+                }else {
+                    search.regSearch(search.getId(), patient.getSurname(), patient.getName(), patient.getpName(), patient.getbDate(), patient.getAttachmentDate(), connection);
                 }
             }
             }catch (IOException | ParseException e) {
