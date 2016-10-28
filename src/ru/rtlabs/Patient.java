@@ -4,12 +4,15 @@ package ru.rtlabs;
 import java.sql.Date;
 
 public class Patient {
+
     private String name;
-    private String Surname;
+    private String surname;
     private String pName;
-    private Date bDate;
-    private String polNumber;
-    private Date attachmentDate;
+    private Date bdate;
+    private String docType;
+    private String docNumber;
+    private String docSer;
+    private Date docDate;
 
     public String getName() {
         return name;
@@ -20,11 +23,11 @@ public class Patient {
     }
 
     public String getSurname() {
-        return Surname;
+        return surname;
     }
 
     public void setSurname(String surname) {
-        Surname = surname;
+        this.surname = surname;
     }
 
     public String getpName() {
@@ -35,27 +38,51 @@ public class Patient {
         this.pName = pName;
     }
 
-    public Date getbDate() {
-        return bDate;
+    public Date getBdate() {
+        return bdate;
     }
 
-    public void setbDate(Date bDate) {
-        this.bDate = bDate;
+    public void setBdate(Date bdate) {
+        this.bdate = bdate;
+    }
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
     }
 
     public String getPolNumber() {
-        return polNumber;
+        return docNumber;
     }
 
     public void setPolNumber(String polNumber) {
-        this.polNumber = polNumber;
+        this.docNumber = polNumber;
     }
 
-    public Date getAttachmentDate() {
-        return attachmentDate;
+    public Date getDocDate() {
+        return docDate;
     }
 
-    public void setAttachmentDate(Date attachmentDate) {
-        this.attachmentDate = attachmentDate;
+    public void setDocDate(Date docDate) {
+        this.docDate = docDate;
+    }
+
+    public String getDocNumber() {
+        return docNumber;
+    }
+
+    public void setDocNumber(String docNumber) {
+        this.docNumber = docNumber;
+    }
+
+    public String getDocSer() {
+        return docSer;
+    }
+
+    public void setDocSer(String docSer) {
+        this.docSer = docSer;
     }
 }

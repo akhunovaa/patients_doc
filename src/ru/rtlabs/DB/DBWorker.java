@@ -8,9 +8,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/**
- * Created by RTlabs on 25.07.2016.
- */
 public class DBWorker {
     //private final String URL = "jdbc:postgresql://localhost:65433/lsd_rmis66";
     //private final String URL = "jdbc:postgresql://192.168.2.114:5432/lsd_rmis66";
@@ -67,7 +64,6 @@ public class DBWorker {
             System.out.println("Не удалось подключиться.");
         }
     }
-
 
     public Connection getConnection() {
         return connection;

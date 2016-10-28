@@ -5,6 +5,7 @@ import ru.rtlabs.DB.DBWorker;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class Main {
@@ -25,5 +26,11 @@ public class Main {
             e.printStackTrace();
         }
         parser.parse(connection, file);
+        try {
+            System.out.println("Закрываю соед. с БД");
+            connection.getConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

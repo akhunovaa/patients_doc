@@ -1,17 +1,18 @@
 package ru.rtlabs;
 
-import org.apache.poi.util.SystemOutLogger;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.xssf.usermodel.*;
 import ru.rtlabs.DB.DBWorker;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -26,7 +27,7 @@ public class Parser {
                 XSSFRow row = sheet.getRow(i);
                 Patient patient = new Patient();
                 PatientSearch search = new  PatientSearch();
-                PatientAdd patientAdd = new PatientAdd();
+                //PatientAdd patientAdd = new PatientAdd();
                 for (int j = 0; j < row.getLastCellNum(); j++) {
                     XSSFCell cell = row.getCell(j);
                     switch (j) {
@@ -36,10 +37,10 @@ public class Parser {
                             } else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
-                                        patient.setPolNumber(cell.getStringCellValue());
+                                        patient.setSurname(cell.getStringCellValue());
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
-                                        patient.setPolNumber(String.valueOf(cell.getNumericCellValue()));
+                                        patient.setSurname(String.valueOf((int)cell.getNumericCellValue()));
                                         break;
                                 }
                             }
@@ -50,10 +51,10 @@ public class Parser {
                             } else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
-                                        patient.setSurname(cell.getStringCellValue());
+                                        patient.setName(cell.getStringCellValue());
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
-                                        patient.setSurname(String.valueOf(cell.getNumericCellValue()));
+                                        patient.setName(String.valueOf((int)cell.getNumericCellValue()));
                                         break;
                                 }
                             }
@@ -64,10 +65,10 @@ public class Parser {
                             } else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
-                                        patient.setName(cell.getStringCellValue());
+                                        patient.setpName(cell.getStringCellValue());
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
-                                        patient.setName(String.valueOf(cell.getNumericCellValue()));
+                                        patient.setpName(String.valueOf((int)cell.getNumericCellValue()));
                                         break;
                                 }
                             }
@@ -78,10 +79,16 @@ public class Parser {
                             } else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
-                                        patient.setpName(cell.getStringCellValue());
+                                        DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+                                        Date parsedB = format.parse(cell.getStringCellValue());
+                                        java.sql.Date sqlD = new java.sql.Date(parsedB.getTime());
+                                        patient.setBdate(sqlD);
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
-                                        patient.setpName(String.valueOf(cell.getNumericCellValue()));
+                                        DateFormat formatqq = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.ENGLISH);
+                                        Date parseB = formatqq.parse(String.valueOf(cell.getDateCellValue()));
+                                        java.sql.Date sqlD2 = new java.sql.Date(parseB.getTime());
+                                        patient.setBdate(sqlD2);
                                         break;
                                 }
                             }
@@ -89,19 +96,14 @@ public class Parser {
                         case 4:
                             if (cell == null) {
                                 continue;
-                            } else {
+                            }
+                            else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
-                                        DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-                                        Date parsedB = format.parse(cell.getStringCellValue());
-                                        java.sql.Date sqlD = new java.sql.Date(parsedB.getTime());
-                                        patient.setbDate(sqlD);
+                                        patient.setDocType(cell.getStringCellValue());
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
-                                        DateFormat formatqq = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.ENGLISH);
-                                        Date parseB = formatqq.parse(String.valueOf(cell.getDateCellValue()));
-                                        java.sql.Date sqlD2 = new java.sql.Date(parseB.getTime());
-                                        patient.setbDate(sqlD2);
+                                        patient.setDocType(String.valueOf((int)cell.getNumericCellValue()));
                                         break;
                                 }
                             }
@@ -109,40 +111,132 @@ public class Parser {
                         case 5:
                             if (cell == null) {
                                 continue;
-                            } else {
+                            }
+                            else {
+                                switch (cell.getCellType()) {
+                                    case XSSFCell.CELL_TYPE_STRING:
+                                        patient.setDocSer(cell.getStringCellValue());
+                                        break;
+                                    case XSSFCell.CELL_TYPE_NUMERIC:
+                                        patient.setDocSer(String.valueOf((int)cell.getNumericCellValue()));
+                                        break;
+                                }
+                            }
+                            break;
+                        case 6:
+                            if (cell == null) {
+                                continue;
+                            }
+                            else {
+                                switch (cell.getCellType()) {
+                                    case XSSFCell.CELL_TYPE_STRING:
+                                        patient.setDocNumber(cell.getStringCellValue());
+                                        break;
+                                    case XSSFCell.CELL_TYPE_NUMERIC:
+                                        patient.setDocNumber(String.valueOf((int)cell.getNumericCellValue()));
+                                        break;
+                                }
+                            }
+                            break;
+                        case 10:
+                            if (cell == null) {
+                                continue;
+                            }
+                            else {
                                 switch (cell.getCellType()) {
                                     case XSSFCell.CELL_TYPE_STRING:
                                         DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
                                         Date parsedB = format.parse(cell.getStringCellValue());
                                         java.sql.Date sqlD = new java.sql.Date(parsedB.getTime());
-                                        patient.setAttachmentDate(sqlD);
+                                        patient.setDocDate(sqlD);
                                         break;
                                     case XSSFCell.CELL_TYPE_NUMERIC:
                                         DateFormat formatqq = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy", Locale.ENGLISH);
                                         Date parseB = formatqq.parse(String.valueOf(cell.getDateCellValue()));
                                         java.sql.Date sqlD2 = new java.sql.Date(parseB.getTime());
-                                        patient.setAttachmentDate(sqlD2);
+                                        patient.setDocDate(sqlD2);
+                                        break;
+                                    case XSSFCell.CELL_TYPE_FORMULA:
+                                        Calendar cal = Calendar.getInstance();
+                                        cal.setTime(patient.getBdate());
+                                        cal.add(Calendar.DATE, 5144);
+                                        java.sql.Date sqlDate = new java.sql.Date(cal.getTime().getTime());
+                                        patient.setDocDate(sqlDate);
+                                        System.out.println(sqlDate);
                                         break;
                                 }
                             }
                             break;
+
                     }
                 }
-                System.out.println(java.util.Calendar.getInstance().getTime() + " Фамилия: " + patient.getSurname() + " Имя: " + patient.getName() + " Отчество: " + patient.getpName() + " День Рождения: " + patient.getbDate() + " Дата прикрепления: " + patient.getAttachmentDate());
+                FileWriter fileWriter2 = new FileWriter("log.txt", true);
+                BufferedWriter writer2 = new BufferedWriter(fileWriter2);
+                writer2.write(java.util.Calendar.getInstance().getTime() + " Фамилия: " + patient.getSurname() + " Имя: " + patient.getName() + " Отчество: " + patient.getpName() + " День Рождения: " + patient.getBdate());
+                writer2.newLine();
+                writer2.flush();
+                writer2.close();
+                System.out.println(java.util.Calendar.getInstance().getTime() + " Фамилия: " + patient.getSurname() + " Имя: " + patient.getName() + " Отчество: " + patient.getpName() + " День Рождения: " + patient.getBdate());
                 System.out.println("Поиск пациента по базе данных...");
-                search.search(patient.getSurname(), patient.getName(), patient.getpName(), patient.getbDate(), patient.getAttachmentDate(), patient.getPolNumber(), connection);
-                if (!search.isHasId()){
-                    patientAdd.add(patient.getSurname(), patient.getName(), patient.getpName(), patient.getPolNumber(), patient.getbDate(), patient.getAttachmentDate(), connection);
+                search.search(patient.getSurname(), patient.getName(), patient.getpName(), patient.getBdate(), patient.getPolNumber(), connection);
+                if (patient.getBdate() != null && patient.getDocDate() != null){
+                    if (patient.getBdate().after(patient.getDocDate()) ){
+                        System.out.println(java.util.Calendar.getInstance().getTime() + " у  пациента дата выдачи документа меньше даты рождения " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate() + " Дата Выдачи" + patient.getDocDate());
+                        FileWriter fileWriter = new FileWriter("log.txt", true);
+                        BufferedWriter writer = new BufferedWriter(fileWriter);
+                        writer.write(java.util.Calendar.getInstance().getTime() + " у  пациента дата выдачи документа меньше даты рождения " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate() + " Дата Выдачи" + patient.getDocDate());
+                        writer.newLine();
+                        writer.flush();
+                        writer.close();
+                    }
                 }else {
-                    search.regSearch(search.getId(), patient.getSurname(), patient.getName(), patient.getpName(), patient.getbDate(), patient.getAttachmentDate(), connection);
+                    System.out.println(java.util.Calendar.getInstance().getTime() + " ошибка в сравнении дат Рождения и Даты Документа. Отсутствует какая то из дат. " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate() + " Дата Выдачи" + patient.getDocDate());
+                    FileWriter fileWriter = new FileWriter("log.txt", true);
+                    BufferedWriter writer = new BufferedWriter(fileWriter);
+                    writer.write(java.util.Calendar.getInstance().getTime() + " ошибка в сравнении дат Рождения и Даты Документа. Отсутствует какая то из дат. " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate() + " Дата Выдачи" + patient.getDocDate());
+                    writer.newLine();
+                    writer.flush();
+                    writer.close();
                 }
+
+                if (search.isHasId()){
+                    if (patient.getDocSer() != null && patient.getDocNumber() != null && patient.getDocDate() != null){
+                        search.hasDoc14(connection);
+                        if (search.isHasDoc14()){
+                            search.docUpdate14(patient.getDocSer(), patient.getDocNumber(), patient.getDocDate(), connection);
+                        }else {
+                            search.docInsert14(patient.getDocSer(), patient.getDocNumber(), patient.getDocDate(), connection);
+                        }
+                        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------");
+                        FileWriter fileWriter = new FileWriter("log.txt", true);
+                        BufferedWriter writer = new BufferedWriter(fileWriter);
+                        writer.write("--------------------------------------------------------------------------------------------------------------------------------------");
+                        writer.newLine();
+                        writer.flush();
+                        writer.close();
+                    }else {
+                        FileWriter fileWriter = new FileWriter("log.txt", true);
+                        BufferedWriter writer = new BufferedWriter(fileWriter);
+                        writer.write(java.util.Calendar.getInstance().getTime() + " у  пациента недостаточно данных по документам для вставки в РМИС (отсутствует Серия или Номер или Дата) " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate());
+                        writer.newLine();
+                        writer.write("--------------------------------------------------------------------------------------------------------------------------------------");
+                        writer.newLine();
+                        writer.flush();
+                        writer.close();
+                    }
+                }else {
+                    System.out.println(java.util.Calendar.getInstance().getTime() + " не найден в РМИС " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate());
+                    FileWriter fileWriter = new FileWriter("log.txt", true);
+                    BufferedWriter writer = new BufferedWriter(fileWriter);
+                    writer.write(java.util.Calendar.getInstance().getTime() + " не найден в РМИС " + patient.getSurname() + " " + patient.getName() + " " + patient.getpName() + " День Рождения " + patient.getBdate());
+                    writer.newLine();
+                    writer.flush();
+                    writer.close();
+                }
+
             }
             }catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
     }
-
-
-
-
